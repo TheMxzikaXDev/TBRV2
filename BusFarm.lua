@@ -84,7 +84,7 @@ local authTitle = Instance.new("TextLabel")
 authTitle.Size = UDim2.new(1, -30, 0, 40)
 authTitle.Position = UDim2.new(0, 15, 0, 12)
 authTitle.BackgroundTransparency = 1
-authTitle.Text = "HUB Skripty X FoX Studios"
+authTitle.Text = "TBR FARM SKRIPTY"
 authTitle.TextColor3 = Color3.new(1, 1, 1)
 authTitle.TextSize = 16
 authTitle.Font = Enum.Font.GothamBold
@@ -187,7 +187,8 @@ task.spawn(function()
     end
 end)
 
-local TOTAL_LAP_TIME = 150
+-- TEMPO AJUSTADO PARA A VERSÃO MAIS RÁPIDA (105s)
+local TOTAL_LAP_TIME = 105
 local STOP_TIME = 3.0
 local TOTAL_STOPS = 13
 local TRAVEL_TIME = TOTAL_LAP_TIME - (TOTAL_STOPS * STOP_TIME)
@@ -265,7 +266,7 @@ local headerTitle = Instance.new("TextLabel")
 headerTitle.Size = UDim2.new(1, -100, 1, 0)
 headerTitle.Position = UDim2.new(0, 15, 0, 0)
 headerTitle.BackgroundTransparency = 1
-headerTitle.Text = "HUB Skripty X FoX Studios"
+headerTitle.Text = "TBR FARM SKRIPTY"
 headerTitle.TextColor3 = Color3.new(1, 1, 1)
 headerTitle.TextSize = 14
 headerTitle.Font = Enum.Font.GothamBold
@@ -633,7 +634,7 @@ local restore = Instance.new("TextButton")
 restore.Size = UDim2.new(0, 145, 0, 42)
 restore.Position = main.Position
 restore.BackgroundColor3 = Color3.fromRGB(12, 14, 21)
-restore.Text = "HUB Skripty"
+restore.Text = "TBR FARM SKRIPTY"
 restore.TextColor3 = Color3.new(1, 1, 1)
 restore.TextSize = 12
 restore.Font = Enum.Font.GothamBold
