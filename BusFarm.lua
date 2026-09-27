@@ -84,7 +84,7 @@ local authTitle = Instance.new("TextLabel")
 authTitle.Size = UDim2.new(1, -30, 0, 40)
 authTitle.Position = UDim2.new(0, 15, 0, 12)
 authTitle.BackgroundTransparency = 1
-authTitle.Text = "TBR FARM SKRIPTY"
+authTitle.Text = "Modo Faster Farm"
 authTitle.TextColor3 = Color3.new(1, 1, 1)
 authTitle.TextSize = 16
 authTitle.Font = Enum.Font.GothamBold
@@ -187,7 +187,6 @@ task.spawn(function()
     end
 end)
 
--- TEMPO AJUSTADO PARA A VERSÃO MAIS RÁPIDA (105s)
 local TOTAL_LAP_TIME = 105
 local STOP_TIME = 3.0
 local TOTAL_STOPS = 13
@@ -266,7 +265,7 @@ local headerTitle = Instance.new("TextLabel")
 headerTitle.Size = UDim2.new(1, -100, 1, 0)
 headerTitle.Position = UDim2.new(0, 15, 0, 0)
 headerTitle.BackgroundTransparency = 1
-headerTitle.Text = "TBR FARM SKRIPTY"
+headerTitle.Text = "Modo Faster Farm"
 headerTitle.TextColor3 = Color3.new(1, 1, 1)
 headerTitle.TextSize = 14
 headerTitle.Font = Enum.Font.GothamBold
@@ -340,7 +339,7 @@ local versionLabel = Instance.new("TextLabel")
 versionLabel.Size = UDim2.new(1, -10, 0, 20)
 versionLabel.Position = UDim2.new(0, 5, 1, -30)
 versionLabel.BackgroundTransparency = 1
-versionLabel.Text = "v4.0"
+versionLabel.Text = "v4.2"
 versionLabel.TextColor3 = Color3.fromRGB(90, 95, 110)
 versionLabel.TextSize = 10
 versionLabel.Font = Enum.Font.Gotham
@@ -362,7 +361,7 @@ farmPage.Parent = content
 local farmTitle = Instance.new("TextLabel")
 farmTitle.Size = UDim2.new(1, 0, 0, 27)
 farmTitle.BackgroundTransparency = 1
-farmTitle.Text = "FARM PANEL"
+farmTitle.Text = "MODO FASTER FARM"
 farmTitle.TextColor3 = Color3.new(1, 1, 1)
 farmTitle.TextSize = 14
 farmTitle.Font = Enum.Font.GothamBold
@@ -634,7 +633,7 @@ local restore = Instance.new("TextButton")
 restore.Size = UDim2.new(0, 145, 0, 42)
 restore.Position = main.Position
 restore.BackgroundColor3 = Color3.fromRGB(12, 14, 21)
-restore.Text = "TBR FARM SKRIPTY"
+restore.Text = "Faster Farm"
 restore.TextColor3 = Color3.new(1, 1, 1)
 restore.TextSize = 12
 restore.Font = Enum.Font.GothamBold
@@ -725,38 +724,34 @@ local function glideExactTime(vehicleModel, seatPart, targetCF, duration)
     end
 end
 
-local function guaranteeCheckpoint(vehicleModel, seatPart, targetCF)
+-- NOVA FUNÇÃO: Zera 100% a velocidade (para o jogo registrar parada) e envia toques pros checkpoints em volta 
+local function guaranteeCheckpoint(vehicleModel, seatPart, targetCF, stopDuration)
     local startTime = tick()
-    local timeout = 3.5
+    local lastTouch = 0
 
-    while isRunning and (tick() - startTime) < timeout do
-        local elapsed = tick() - startTime
-        local offsetZ = math.sin(elapsed * math.pi * 1.5) * 10
-        local sweepCF = targetCF * CFrame.new(0, 2, offsetZ)
+    while isRunning and (tick() - startTime) < stopDuration do
+        -- Mantém o ônibus 100% imóvel no lugar exato (sem o movimento doido da última versão)
+        vehicleModel:PivotTo(targetCF + Vector3.new(0, 3, 0))
+        freezePhysics(seatPart)
         
-        vehicleModel:PivotTo(sweepCF)
-        
-        local direction = (math.cos(elapsed * math.pi * 1.5) > 0) and 1 or -1
-        seatPart.AssemblyLinearVelocity = sweepCF.LookVector * (60 * direction)
-        
-        local foundMarker = false
-        local radiusParts = workspace:GetPartBoundsInRadius(targetCF.Position, 35)
-        
-        for _, part in ipairs(radiusParts) do
-            if part:FindFirstChildWhichIsA("TouchTransmitter") or part:FindFirstChildWhichIsA("BillboardGui") or part.Name:lower():find("check") or part.Name:lower():find("point") then
-                foundMarker = true
-                pcall(function()
-                    if firetouchinterest then
-                        firetouchinterest(seatPart, part, 0)
-                        task.wait(0.005)
-                        firetouchinterest(seatPart, part, 1)
+        -- A cada 0.5 segundos, forçamos o "toque" nos checkpoints ao redor silenciosamente
+        if tick() - lastTouch > 0.5 then
+            lastTouch = tick()
+            task.spawn(function()
+                local radiusParts = workspace:GetPartBoundsInRadius(targetCF.Position, 45)
+                for _, part in ipairs(radiusParts) do
+                    local n = part.Name:lower()
+                    if part:FindFirstChildWhichIsA("TouchTransmitter") or n:find("check") or n:find("point") or n:find("stop") or n:find("parada") then
+                        pcall(function()
+                            if firetouchinterest then
+                                firetouchinterest(seatPart, part, 0)
+                                task.wait(0.05)
+                                firetouchinterest(seatPart, part, 1)
+                            end
+                        end)
                     end
-                end)
-            end
-        end
-        
-        if not foundMarker and elapsed > 0.8 then
-            break 
+                end
+            end)
         end
         
         RunService.Heartbeat:Wait()
@@ -856,7 +851,8 @@ local function startFarm()
                 glideExactTime(vehicleModel, seat, busStops[i], duration)
                 if not isRunning then return end
                 
-                guaranteeCheckpoint(vehicleModel, seat, busStops[i])
+                -- Usa o tempo exato de 3s travando o ônibus 100% no local.
+                guaranteeCheckpoint(vehicleModel, seat, busStops[i], STOP_TIME)
                 if not isRunning then return end
 
                 if i == TOTAL_STOPS then
