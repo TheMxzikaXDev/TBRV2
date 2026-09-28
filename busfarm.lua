@@ -20,22 +20,41 @@ for _, id in ipairs(BLACKLISTED_IDS) do
     end
 end
 
-local CONFIG_FILE = "bus_farm_config.lua"
+local CONFIG_FILES = {"bus_farm_config.lua", "busfarmconfig.lua", "bus_farm_config.txt", "busfarmconfig.txt"}
 
 local function loadConfig()
-    local okRead, src = pcall(function() return readfile(CONFIG_FILE) end)
-    if not okRead or type(src) ~= "string" then
-        warn("[HUB] Config file not found: " .. CONFIG_FILE)
+    local genv = getgenv and getgenv()
+    if genv and type(genv.BUS_FARM_CONFIG) == "table" then
+        return genv.BUS_FARM_CONFIG
+    end
+
+    if type(readfile) ~= "function" then
+        warn("[HUB] Your executor does not support readfile. Use getgenv().BUS_FARM_CONFIG instead.")
         return nil
     end
+
+    local src, usedName
+    for _, name in ipairs(CONFIG_FILES) do
+        local okRead, content = pcall(readfile, name)
+        if okRead and type(content) == "string" then
+            src, usedName = content, name
+            break
+        end
+    end
+
+    if not src then
+        warn("[HUB] Config file not found. Put one of these in the executor workspace folder: " .. table.concat(CONFIG_FILES, ", "))
+        return nil
+    end
+
     local chunk, err = loadstring(src)
     if not chunk then
-        warn("[HUB] Config file error: " .. tostring(err))
+        warn("[HUB] Config file error (" .. usedName .. "): " .. tostring(err))
         return nil
     end
     local okRun, cfg = pcall(chunk)
     if not okRun or type(cfg) ~= "table" then
-        warn("[HUB] Config file must return a table")
+        warn("[HUB] Config file must start with 'return {' and end with '}'")
         return nil
     end
     return cfg
