@@ -22,10 +22,23 @@ end
 
 local CONFIG_FILES = {"bus_farm_config.lua", "busfarmconfig.lua", "bus_farm_config.txt", "busfarmconfig.txt"}
 
+local passedConfig = ...
+
 local function loadConfig()
-    local genv = getgenv and getgenv()
-    if genv and type(genv.BUS_FARM_CONFIG) == "table" then
-        return genv.BUS_FARM_CONFIG
+    if type(passedConfig) == "table" then
+        return passedConfig
+    end
+
+    local sources = {
+        function() return getgenv and getgenv().BUS_FARM_CONFIG end,
+        function() return shared and shared.BUS_FARM_CONFIG end,
+        function() return _G and _G.BUS_FARM_CONFIG end,
+    }
+    for _, getter in ipairs(sources) do
+        local ok, value = pcall(getter)
+        if ok and type(value) == "table" then
+            return value
+        end
     end
 
     if type(readfile) ~= "function" then
