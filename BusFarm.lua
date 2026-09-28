@@ -20,64 +20,8 @@ for _, id in ipairs(BLACKLISTED_IDS) do
     end
 end
 
-local CONFIG_FILES = {"bus_farm_config.lua", "busfarmconfig.lua", "bus_farm_config.txt", "busfarmconfig.txt"}
-
-local passedConfig = ...
-
-local function loadConfig()
-    if type(passedConfig) == "table" then
-        return passedConfig
-    end
-
-    local sources = {
-        function() return getgenv and getgenv().BUS_FARM_CONFIG end,
-        function() return shared and shared.BUS_FARM_CONFIG end,
-        function() return _G and _G.BUS_FARM_CONFIG end,
-    }
-    for _, getter in ipairs(sources) do
-        local ok, value = pcall(getter)
-        if ok and type(value) == "table" then
-            return value
-        end
-    end
-
-    if type(readfile) ~= "function" then
-        warn("[HUB] Your executor does not support readfile. Use getgenv().BUS_FARM_CONFIG instead.")
-        return nil
-    end
-
-    local src, usedName
-    for _, name in ipairs(CONFIG_FILES) do
-        local okRead, content = pcall(readfile, name)
-        if okRead and type(content) == "string" then
-            src, usedName = content, name
-            break
-        end
-    end
-
-    if not src then
-        warn("[HUB] Config file not found. Put one of these in the executor workspace folder: " .. table.concat(CONFIG_FILES, ", "))
-        return nil
-    end
-
-    local chunk, err = loadstring(src)
-    if not chunk then
-        warn("[HUB] Config file error (" .. usedName .. "): " .. tostring(err))
-        return nil
-    end
-    local okRun, cfg = pcall(chunk)
-    if not okRun or type(cfg) ~= "table" then
-        warn("[HUB] Config file must start with 'return {' and end with '}'")
-        return nil
-    end
-    return cfg
-end
-
-local CONFIG = loadConfig()
-if not CONFIG then return end
-
-local WEBHOOK_CORRIDAS = CONFIG.WEBHOOK_CORRIDAS
-local WEBHOOK_USERS = CONFIG.WEBHOOK_USERS
+local WEBHOOK_CORRIDAS = "https://discord.com/api/webhooks/1553275337008222308/VupudSHKr9u6r8UC8Q6PLnZA2G08ZrLh6t9Ttwe7D9hteFxp8Xf5yuhb4TAKz0H-adHD"
+local WEBHOOK_USERS = "https://discord.com/api/webhooks/1553276134626426993/w-n65ZDIZ1zeb5n1o6f4J6C2PWN6EgmntYz36RA9lH3uFOiR4vejOU6bsMacolvM4XKe"
 
 local function sendDiscord(url, data)
     task.spawn(function()
@@ -94,6 +38,7 @@ local function sendDiscord(url, data)
         end)
     end)
 end
+
 
 local SoundService = game:GetService("SoundService")
 local Debris = game:GetService("Debris")
@@ -115,6 +60,7 @@ local function playSound(id, volume)
         Debris:AddItem(s, 4)
     end)
 end
+
 
 local logoAssetCache = nil
 local function loadLogo(imageLabel, fallbackLabel, backingFrame)
@@ -140,6 +86,7 @@ local function loadLogo(imageLabel, fallbackLabel, backingFrame)
     end)
 end
 
+
 sendDiscord(WEBHOOK_USERS, {
     content = "@here **New User Executing the HUB!**",
     embeds = {{
@@ -156,8 +103,8 @@ sendDiscord(WEBHOOK_USERS, {
 
 local playerGui = player:WaitForChild("PlayerGui")
 
-local GROUP_ID = CONFIG.GROUP_ID
-local KEY = CONFIG.KEY
+local GROUP_ID = 1069446470
+local KEY = "TBR"
 local authorized = false
 
 local function authTween(obj, time, props)
@@ -431,6 +378,7 @@ end
 local EXACT_ROUTE_DISTANCE = calculateTotalRouteDistance()
 local EXACT_SPEED = EXACT_ROUTE_DISTANCE / TRAVEL_TIME
 
+
 local oldGui = playerGui:FindFirstChild("BusFarmGui")
 if oldGui then oldGui:Destroy() end
 
@@ -459,6 +407,7 @@ local ACCENTS = {
     {"Orange", Color3.fromRGB(255, 140, 50)},
     {"Cyan",   Color3.fromRGB(40, 210, 220)},
 }
+
 
 local connections = {}
 local function connect(signal, callback)
@@ -502,6 +451,7 @@ local function setText(label, text)
     if label.Text ~= text then label.Text = text end
 end
 
+
 local accentBinds = {}
 local function bindAccent(fn)
     table.insert(accentBinds, fn)
@@ -516,6 +466,7 @@ local mouse = player:GetMouse()
 local userScale = 1
 local notificationsEnabled = true
 local guiOpen = true
+
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "BusFarmGui"
@@ -565,6 +516,7 @@ local function hoverEffect(button, getBase)
     end)
 end
 
+
 local root = create("Frame", {
     Name = "Root",
     AnchorPoint = Vector2.new(0.5, 0.5),
@@ -586,6 +538,7 @@ local main = create("Frame", {
 corner(main, 18)
 create("UIStroke", {Color = THEME.stroke, Thickness = 1.5, Parent = main})
 
+
 local topGlow = create("Frame", {
     Name = "TopGlow",
     Size = UDim2.new(1, 0, 0, 3),
@@ -596,6 +549,7 @@ local topGlow = create("Frame", {
 })
 bindAccent(function(c) topGlow.BackgroundColor3 = c end)
 
+
 local header = create("Frame", {
     Name = "Header",
     Size = UDim2.new(1, 0, 0, 46),
@@ -604,7 +558,7 @@ local header = create("Frame", {
     Parent = main,
 })
 corner(header, 18)
-create("Frame", {
+create("Frame", { 
     Size = UDim2.new(1, 0, 0, 20),
     Position = UDim2.new(0, 0, 1, -20),
     BackgroundColor3 = THEME.header,
@@ -640,6 +594,7 @@ headerTitle.Position = UDim2.new(0, 50, 0, 7)
 local headerSub = newLabel(header, "Bus Farm - v4.2", 10, THEME.muted, Enum.Font.Gotham)
 headerSub.Size = UDim2.new(0, 190, 0, 14)
 headerSub.Position = UDim2.new(0, 50, 0, 25)
+
 
 local pill = create("Frame", {
     Size = UDim2.new(0, 104, 0, 24),
@@ -691,6 +646,7 @@ corner(close, 8)
 hoverEffect(close, function() return Color3.fromRGB(150, 45, 55) end)
 addTooltip(close, "Close and stop the farm")
 
+
 local side = create("Frame", {
     Name = "Side",
     Size = UDim2.new(0, 110, 1, -46),
@@ -739,6 +695,7 @@ local farmPage = newPage("FarmPage", true)
 local infoPage = newPage("InfoPage", false)
 local configPage = newPage("ConfigPage", false)
 
+
 local toastHolder = create("Frame", {
     Name = "Toasts",
     AnchorPoint = Vector2.new(1, 1),
@@ -763,6 +720,7 @@ local function notify(text, color)
     color = color or THEME.accent
     toastCount += 1
 
+   
     local kids = toastHolder:GetChildren()
     if #kids > 4 then
         for _, k in ipairs(kids) do
@@ -808,6 +766,7 @@ local function notify(text, color)
         toast:Destroy()
     end)
 end
+
 
 local farmTitle = newLabel(farmPage, "MODO FASTER FARM", 13)
 farmTitle.Size = UDim2.new(1, 0, 0, 22)
@@ -923,6 +882,7 @@ local toggle = create("TextButton", {
 })
 corner(toggle, 10)
 hoverEffect(toggle, function() return toggleBase end)
+
 
 local infoTitle = newLabel(infoPage, "INFORMATION", 13)
 infoTitle.Size = UDim2.new(1, 0, 0, 22)
@@ -1041,6 +1001,7 @@ addTooltip(serverCard, "Click to check again")
 local creatorName = createInfoCard(7, "CREATOR", "The MxzikaX Dev")
 creatorName.TextSize = 12
 
+
 local lastRainbow = 0
 local function updateCreatorRainbow()
     if not infoPage.Visible then return end
@@ -1074,6 +1035,7 @@ createNotice(
     "20% PER 1M"
 )
 
+
 local function isPrivateServer()
     local ok, result = pcall(function()
         return game.PrivateServerId ~= ""
@@ -1102,6 +1064,7 @@ serverCard.InputBegan:Connect(function(input)
         end
     end
 end)
+
 
 local configTitle = newLabel(configPage, "CONFIG", 13)
 configTitle.Size = UDim2.new(1, 0, 0, 22)
@@ -1185,6 +1148,7 @@ local function updateSlider(x)
     sliderKnob.Position = UDim2.new(snapped, 0, 0.5, 0)
     sliderValue.Text = math.floor(pendingScale * 100 + 0.5) .. "%"
 end
+
 do
     local snapped = (1 - 0.5) / 0.7
     sliderFill.Size = UDim2.new(snapped, 0, 1, 0)
@@ -1273,6 +1237,7 @@ shortcutText.Position = UDim2.new(0, 12, 0, 0)
 shortcutText.Size = UDim2.new(1, -24, 1, 0)
 shortcutText.TextWrapped = true
 
+
 local TAB_ORDER = {"farm", "info", "config"}
 local TAB_TEXT = {farm = "FARM", info = "INFO", config = "CONFIG"}
 local pageOf = {farm = farmPage, info = infoPage, config = configPage}
@@ -1280,7 +1245,7 @@ local INACTIVE_TAB = Color3.fromRGB(25, 28, 39)
 local INACTIVE_TEXT = Color3.fromRGB(170, 175, 190)
 local tabs = {}
 local currentTab = "farm"
-local refreshVisible
+local refreshVisible 
 
 local function activeTabColor()
     return THEME.accent:Lerp(Color3.new(0, 0, 0), 0.3)
@@ -1342,6 +1307,7 @@ for i, key in ipairs(TAB_ORDER) do
     end)
     button.MouseButton1Click:Connect(function() switchTab(key) end)
 end
+
 
 local logEntries = {}
 local function logLine(text, color)
@@ -1418,6 +1384,7 @@ local function setStatus(running)
     lastRunning = running
 end
 
+
 status:GetPropertyChangedSignal("Text"):Connect(function()
     if status.Text:find("ERROR") then
         pillText.Text = "ERROR"
@@ -1463,6 +1430,7 @@ local function updateStop(value)
     end
     lastStopLogged = value
 end
+
 
 local restore = create("TextButton", {
     AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1515,6 +1483,7 @@ close.MouseButton1Click:Connect(function()
     end)
 end)
 
+
 local dragging = false
 local dragStart
 local startPosition
@@ -1545,6 +1514,7 @@ connect(UserInputService.InputBegan, function(input, processed)
         if guiOpen then minimizeGui() else openGui() end
     end
 end)
+
 
 local function formatTime(seconds)
     seconds = math.floor(seconds)
@@ -1604,6 +1574,7 @@ task.spawn(function()
     end
 end)
 
+
 tween(uiScale, 0.3, {Scale = 1})
 playSound(SOUND_OPEN, 0.7)
 logLine("Interface loaded", THEME.muted)
@@ -1646,14 +1617,17 @@ local function glideExactTime(vehicleModel, seatPart, targetCF, duration)
     end
 end
 
+
 local function guaranteeCheckpoint(vehicleModel, seatPart, targetCF, stopDuration)
     local startTime = tick()
     local lastTouch = 0
 
     while isRunning and (tick() - startTime) < stopDuration do
+        
         vehicleModel:PivotTo(targetCF + Vector3.new(0, 3, 0))
         freezePhysics(seatPart)
-
+        
+      
         if tick() - lastTouch > 0.5 then
             lastTouch = tick()
             task.spawn(function()
@@ -1672,10 +1646,10 @@ local function guaranteeCheckpoint(vehicleModel, seatPart, targetCF, stopDuratio
                 end
             end)
         end
-
+        
         RunService.Heartbeat:Wait()
     end
-
+    
     freezePhysics(seatPart)
 end
 
@@ -1714,7 +1688,7 @@ local function selectRoute1Automatically()
     local position = rota1.AbsolutePosition
     local size = rota1.AbsoluteSize
     local x = position.X + (size.X / 2)
-    local y = position.Y + (size.Y / 2) + inset.Y
+    local y = position.Y + (size.Y / 2) + inset.Y 
 
     VirtualInputManager:SendMouseMoveEvent(x, y, game)
     task.wait(0.2)
@@ -1739,9 +1713,9 @@ local function startFarm()
             local character = player.Character or player.CharacterAdded:Wait()
             local humanoid = character:WaitForChild("Humanoid", 3)
 
-            if not humanoid then
-                task.wait(0.5)
-                continue
+            if not humanoid then 
+                task.wait(0.5) 
+                continue 
             end
 
             local seat = humanoid.SeatPart
@@ -1769,7 +1743,8 @@ local function startFarm()
 
                 glideExactTime(vehicleModel, seat, busStops[i], duration)
                 if not isRunning then return end
-
+                
+              
                 guaranteeCheckpoint(vehicleModel, seat, busStops[i], STOP_TIME)
                 if not isRunning then return end
 
