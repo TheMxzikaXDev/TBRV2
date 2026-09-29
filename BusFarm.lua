@@ -337,9 +337,9 @@ task.spawn(function()
     end
 end)
 
-local STOP_TIME = 3.0
+local STOP_TIME = 2.5
 local TOTAL_STOPS = 13
-local TRAVEL_TIME = 53
+local TRAVEL_TIME = 55
 local TOTAL_LAP_TIME = TOTAL_STOPS * STOP_TIME + TRAVEL_TIME
 
 local busStops = {
