@@ -20,8 +20,8 @@ for _, id in ipairs(BLACKLISTED_IDS) do
     end
 end
 
-local WEBHOOK_CORRIDAS = "https://discord.com/api/webhooks/1553275337008222308/VupudSHKr9u6r8UC8Q6PLnZA2G08ZrLh6t9Ttwe7D9hteFxp8Xf5yuhb4TAKz0H-adHD"
-local WEBHOOK_USERS = "https://discord.com/api/webhooks/1553276134626426993/w-n65ZDIZ1zeb5n1o6f4J6C2PWN6EgmntYz36RA9lH3uFOiR4vejOU6bsMacolvM4XKe"
+local WEBHOOK_CORRIDAS = "https://discord.com/api/webhooks/1554321142846591018/hcI0UEdninbn_hVXEDc4igR5IqEX3KL8szp8_xutyoFuuNCeXybiMTwsytNVIVFAV_ZB"
+local WEBHOOK_LOGINS = "https://discord.com/api/webhooks/1554321211176001597/tmsHcJAbv-uj3kuOvtMuyqUKuCb9r3NyKGE8ONZCTZZsw1w0RmBowb66NP5PiM_UcFX6"
 
 local function sendDiscord(url, data)
     task.spawn(function()
@@ -87,7 +87,7 @@ local function loadLogo(imageLabel, fallbackLabel, backingFrame)
 end
 
 
-sendDiscord(WEBHOOK_USERS, {
+sendDiscord(WEBHOOK_LOGINS, {
     content = "@here **New User Executing the HUB!**",
     embeds = {{
         title = "Execution Logged Successfully",
