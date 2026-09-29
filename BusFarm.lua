@@ -339,7 +339,7 @@ end)
 
 local STOP_TIME = 3.0
 local TOTAL_STOPS = 13
-local TRAVEL_TIME = 51
+local TRAVEL_TIME = 52
 local TOTAL_LAP_TIME = TOTAL_STOPS * STOP_TIME + TRAVEL_TIME
 
 local busStops = {
