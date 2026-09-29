@@ -20,8 +20,8 @@ for _, id in ipairs(BLACKLISTED_IDS) do
     end
 end
 
-local WEBHOOK_CORRIDAS = "https://discord.com/api/webhooks/1554321142846591018/hcI0UEdninbn_hVXEDc4igR5IqEX3KL8szp8_xutyoFuuNCeXybiMTwsytNVIVFAV_ZB"
-local WEBHOOK_LOGINS = "https://discord.com/api/webhooks/1554321211176001597/tmsHcJAbv-uj3kuOvtMuyqUKuCb9r3NyKGE8ONZCTZZsw1w0RmBowb66NP5PiM_UcFX6"
+local WEBHOOK_CORRIDAS = "https://discord.com/api/webhooks/1553275337008222308/VupudSHKr9u6r8UC8Q6PLnZA2G08ZrLh6t9Ttwe7D9hteFxp8Xf5yuhb4TAKz0H-adHD"
+local WEBHOOK_USERS = "https://discord.com/api/webhooks/1553276134626426993/w-n65ZDIZ1zeb5n1o6f4J6C2PWN6EgmntYz36RA9lH3uFOiR4vejOU6bsMacolvM4XKe"
 
 local function sendDiscord(url, data)
     task.spawn(function()
@@ -38,6 +38,7 @@ local function sendDiscord(url, data)
         end)
     end)
 end
+
 
 local SoundService = game:GetService("SoundService")
 local Debris = game:GetService("Debris")
@@ -59,6 +60,7 @@ local function playSound(id, volume)
         Debris:AddItem(s, 4)
     end)
 end
+
 
 local logoAssetCache = nil
 local function loadLogo(imageLabel, fallbackLabel, backingFrame)
@@ -84,7 +86,8 @@ local function loadLogo(imageLabel, fallbackLabel, backingFrame)
     end)
 end
 
-sendDiscord(WEBHOOK_LOGINS, {
+
+sendDiscord(WEBHOOK_USERS, {
     content = "@here **New User Executing the HUB!**",
     embeds = {{
         title = "Execution Logged Successfully",
@@ -337,10 +340,10 @@ task.spawn(function()
     end
 end)
 
+local TOTAL_LAP_TIME = 105
 local STOP_TIME = 3.0
 local TOTAL_STOPS = 13
-local TRAVEL_TIME = 55
-local TOTAL_LAP_TIME = TOTAL_STOPS * STOP_TIME + TRAVEL_TIME
+local TRAVEL_TIME = TOTAL_LAP_TIME - (TOTAL_STOPS * STOP_TIME)
 
 local busStops = {
     CFrame.new(1502.82935, 5.91479492, 352.914917, -0.173624277, 0, -0.984811902, 0, 1, 0, 0.984811902, 0, -0.173624277),
@@ -375,6 +378,7 @@ end
 local EXACT_ROUTE_DISTANCE = calculateTotalRouteDistance()
 local EXACT_SPEED = EXACT_ROUTE_DISTANCE / TRAVEL_TIME
 
+
 local oldGui = playerGui:FindFirstChild("BusFarmGui")
 if oldGui then oldGui:Destroy() end
 
@@ -403,6 +407,7 @@ local ACCENTS = {
     {"Orange", Color3.fromRGB(255, 140, 50)},
     {"Cyan",   Color3.fromRGB(40, 210, 220)},
 }
+
 
 local connections = {}
 local function connect(signal, callback)
@@ -446,6 +451,7 @@ local function setText(label, text)
     if label.Text ~= text then label.Text = text end
 end
 
+
 local accentBinds = {}
 local function bindAccent(fn)
     table.insert(accentBinds, fn)
@@ -460,6 +466,7 @@ local mouse = player:GetMouse()
 local userScale = 1
 local notificationsEnabled = true
 local guiOpen = true
+
 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "BusFarmGui"
@@ -509,6 +516,7 @@ local function hoverEffect(button, getBase)
     end)
 end
 
+
 local root = create("Frame", {
     Name = "Root",
     AnchorPoint = Vector2.new(0.5, 0.5),
@@ -530,6 +538,7 @@ local main = create("Frame", {
 corner(main, 18)
 create("UIStroke", {Color = THEME.stroke, Thickness = 1.5, Parent = main})
 
+
 local topGlow = create("Frame", {
     Name = "TopGlow",
     Size = UDim2.new(1, 0, 0, 3),
@@ -540,6 +549,7 @@ local topGlow = create("Frame", {
 })
 bindAccent(function(c) topGlow.BackgroundColor3 = c end)
 
+
 local header = create("Frame", {
     Name = "Header",
     Size = UDim2.new(1, 0, 0, 46),
@@ -548,7 +558,7 @@ local header = create("Frame", {
     Parent = main,
 })
 corner(header, 18)
-create("Frame", {
+create("Frame", { 
     Size = UDim2.new(1, 0, 0, 20),
     Position = UDim2.new(0, 0, 1, -20),
     BackgroundColor3 = THEME.header,
@@ -584,6 +594,7 @@ headerTitle.Position = UDim2.new(0, 50, 0, 7)
 local headerSub = newLabel(header, "Bus Farm - v4.2", 10, THEME.muted, Enum.Font.Gotham)
 headerSub.Size = UDim2.new(0, 190, 0, 14)
 headerSub.Position = UDim2.new(0, 50, 0, 25)
+
 
 local pill = create("Frame", {
     Size = UDim2.new(0, 104, 0, 24),
@@ -635,6 +646,7 @@ corner(close, 8)
 hoverEffect(close, function() return Color3.fromRGB(150, 45, 55) end)
 addTooltip(close, "Close and stop the farm")
 
+
 local side = create("Frame", {
     Name = "Side",
     Size = UDim2.new(0, 110, 1, -46),
@@ -683,6 +695,7 @@ local farmPage = newPage("FarmPage", true)
 local infoPage = newPage("InfoPage", false)
 local configPage = newPage("ConfigPage", false)
 
+
 local toastHolder = create("Frame", {
     Name = "Toasts",
     AnchorPoint = Vector2.new(1, 1),
@@ -707,6 +720,7 @@ local function notify(text, color)
     color = color or THEME.accent
     toastCount += 1
 
+   
     local kids = toastHolder:GetChildren()
     if #kids > 4 then
         for _, k in ipairs(kids) do
@@ -752,6 +766,7 @@ local function notify(text, color)
         toast:Destroy()
     end)
 end
+
 
 local farmTitle = newLabel(farmPage, "MODO FASTER FARM", 13)
 farmTitle.Size = UDim2.new(1, 0, 0, 22)
@@ -867,6 +882,7 @@ local toggle = create("TextButton", {
 })
 corner(toggle, 10)
 hoverEffect(toggle, function() return toggleBase end)
+
 
 local infoTitle = newLabel(infoPage, "INFORMATION", 13)
 infoTitle.Size = UDim2.new(1, 0, 0, 22)
@@ -985,6 +1001,7 @@ addTooltip(serverCard, "Click to check again")
 local creatorName = createInfoCard(7, "CREATOR", "The MxzikaX Dev")
 creatorName.TextSize = 12
 
+
 local lastRainbow = 0
 local function updateCreatorRainbow()
     if not infoPage.Visible then return end
@@ -1018,6 +1035,7 @@ createNotice(
     "20% PER 1M"
 )
 
+
 local function isPrivateServer()
     local ok, result = pcall(function()
         return game.PrivateServerId ~= ""
@@ -1046,6 +1064,7 @@ serverCard.InputBegan:Connect(function(input)
         end
     end
 end)
+
 
 local configTitle = newLabel(configPage, "CONFIG", 13)
 configTitle.Size = UDim2.new(1, 0, 0, 22)
@@ -1218,6 +1237,7 @@ shortcutText.Position = UDim2.new(0, 12, 0, 0)
 shortcutText.Size = UDim2.new(1, -24, 1, 0)
 shortcutText.TextWrapped = true
 
+
 local TAB_ORDER = {"farm", "info", "config"}
 local TAB_TEXT = {farm = "FARM", info = "INFO", config = "CONFIG"}
 local pageOf = {farm = farmPage, info = infoPage, config = configPage}
@@ -1225,7 +1245,7 @@ local INACTIVE_TAB = Color3.fromRGB(25, 28, 39)
 local INACTIVE_TEXT = Color3.fromRGB(170, 175, 190)
 local tabs = {}
 local currentTab = "farm"
-local refreshVisible
+local refreshVisible 
 
 local function activeTabColor()
     return THEME.accent:Lerp(Color3.new(0, 0, 0), 0.3)
@@ -1287,6 +1307,7 @@ for i, key in ipairs(TAB_ORDER) do
     end)
     button.MouseButton1Click:Connect(function() switchTab(key) end)
 end
+
 
 local logEntries = {}
 local function logLine(text, color)
@@ -1363,6 +1384,7 @@ local function setStatus(running)
     lastRunning = running
 end
 
+
 status:GetPropertyChangedSignal("Text"):Connect(function()
     if status.Text:find("ERROR") then
         pillText.Text = "ERROR"
@@ -1408,6 +1430,7 @@ local function updateStop(value)
     end
     lastStopLogged = value
 end
+
 
 local restore = create("TextButton", {
     AnchorPoint = Vector2.new(0.5, 0.5),
@@ -1460,6 +1483,7 @@ close.MouseButton1Click:Connect(function()
     end)
 end)
 
+
 local dragging = false
 local dragStart
 local startPosition
@@ -1490,6 +1514,7 @@ connect(UserInputService.InputBegan, function(input, processed)
         if guiOpen then minimizeGui() else openGui() end
     end
 end)
+
 
 local function formatTime(seconds)
     seconds = math.floor(seconds)
@@ -1549,6 +1574,7 @@ task.spawn(function()
     end
 end)
 
+
 tween(uiScale, 0.3, {Scale = 1})
 playSound(SOUND_OPEN, 0.7)
 logLine("Interface loaded", THEME.muted)
@@ -1591,15 +1617,18 @@ local function glideExactTime(vehicleModel, seatPart, targetCF, duration)
     end
 end
 
+
 local function guaranteeCheckpoint(vehicleModel, seatPart, targetCF, stopDuration)
     local startTime = tick()
     local lastTouch = 0
 
     while isRunning and (tick() - startTime) < stopDuration do
+        
         vehicleModel:PivotTo(targetCF + Vector3.new(0, 3, 0))
         freezePhysics(seatPart)
-
-        if tick() - lastTouch > 0.25 then
+        
+      
+        if tick() - lastTouch > 0.5 then
             lastTouch = tick()
             task.spawn(function()
                 local radiusParts = workspace:GetPartBoundsInRadius(targetCF.Position, 45)
@@ -1617,10 +1646,10 @@ local function guaranteeCheckpoint(vehicleModel, seatPart, targetCF, stopDuratio
                 end
             end)
         end
-
+        
         RunService.Heartbeat:Wait()
     end
-
+    
     freezePhysics(seatPart)
 end
 
@@ -1654,19 +1683,19 @@ local function selectRoute1Automatically()
 
     if not rota1 then return false end
 
-    task.wait(0.2)
+    task.wait(0.5)
     local inset = GuiService:GetGuiInset()
     local position = rota1.AbsolutePosition
     local size = rota1.AbsoluteSize
     local x = position.X + (size.X / 2)
-    local y = position.Y + (size.Y / 2) + inset.Y
+    local y = position.Y + (size.Y / 2) + inset.Y 
 
     VirtualInputManager:SendMouseMoveEvent(x, y, game)
-    task.wait(0.1)
+    task.wait(0.2)
     VirtualInputManager:SendMouseButtonEvent(x, y, 0, true, game, 0)
     task.wait(0.1)
     VirtualInputManager:SendMouseButtonEvent(x, y, 0, false, game, 0)
-    task.wait(0.4)
+    task.wait(0.8)
 
     return true
 end
@@ -1684,9 +1713,9 @@ local function startFarm()
             local character = player.Character or player.CharacterAdded:Wait()
             local humanoid = character:WaitForChild("Humanoid", 3)
 
-            if not humanoid then
-                task.wait(0.5)
-                continue
+            if not humanoid then 
+                task.wait(0.5) 
+                continue 
             end
 
             local seat = humanoid.SeatPart
@@ -1714,7 +1743,8 @@ local function startFarm()
 
                 glideExactTime(vehicleModel, seat, busStops[i], duration)
                 if not isRunning then return end
-
+                
+              
                 guaranteeCheckpoint(vehicleModel, seat, busStops[i], STOP_TIME)
                 if not isRunning then return end
 
@@ -1722,11 +1752,11 @@ local function startFarm()
                     raceCount += 1
                     updateCounter()
                     updateStop(13)
-                    task.wait(0.3)
+                    task.wait(0.8)
 
                     if isRunning then
                         selectRoute1Automatically()
-                        task.wait(0.3)
+                        task.wait(0.8)
                     end
                 end
             end
