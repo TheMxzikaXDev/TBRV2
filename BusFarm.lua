@@ -20,8 +20,8 @@ for _, id in ipairs(BLACKLISTED_IDS) do
     end
 end
 
-local WEBHOOK_CORRIDAS = "https://discord.com/api/webhooks/1553275337008222308/VupudSHKr9u6r8UC8Q6PLnZA2G08ZrLh6t9Ttwe7D9hteFxp8Xf5yuhb4TAKz0H-adHD"
-local WEBHOOK_USERS = "https://discord.com/api/webhooks/1553276134626426993/w-n65ZDIZ1zeb5n1o6f4J6C2PWN6EgmntYz36RA9lH3uFOiR4vejOU6bsMacolvM4XKe"
+local WEBHOOK_CORRIDAS = "https://discord.com/api/webhooks/1554321142846591018/hcI0UEdninbn_hVXEDc4igR5IqEX3KL8szp8_xutyoFuuNCeXybiMTwsytNVIVFAV_ZB"
+local WEBHOOK_LOGINS = "https://discord.com/api/webhooks/1554321211176001597/tmsHcJAbv-uj3kuOvtMuyqUKuCb9r3NyKGE8ONZCTZZsw1w0RmBowb66NP5PiM_UcFX6"
 
 local function sendDiscord(url, data)
     task.spawn(function()
@@ -45,6 +45,7 @@ local Debris = game:GetService("Debris")
 
 local LOGO_URL = "https://i.ibb.co/M5y1yCjM/Skripty-X-Fox-Studios.png"
 local LOGO_FILE = "SkriptyXFox_logo.png"
+local CREATOR_USER_ID = 1250139
 local SOUND_OPEN = "rbxasset://sounds/electronicpingshort.wav"
 local SOUND_CLOSE = "rbxasset://sounds/switch.wav"
 local soundsEnabled = true
@@ -87,7 +88,7 @@ local function loadLogo(imageLabel, fallbackLabel, backingFrame)
 end
 
 
-sendDiscord(WEBHOOK_USERS, {
+sendDiscord(WEBHOOK_LOGINS, {
     content = "@here **New User Executing the HUB!**",
     embeds = {{
         title = "Execution Logged Successfully",
@@ -693,6 +694,7 @@ local function newPage(name, visible)
 end
 local farmPage = newPage("FarmPage", true)
 local infoPage = newPage("InfoPage", false)
+local creditsPage = newPage("CreditsPage", false)
 local configPage = newPage("ConfigPage", false)
 
 
@@ -998,20 +1000,7 @@ local pingValue = createInfoCard(5, "PING", "--")
 local serverValue, serverCard = createInfoCard(6, "SERVER", "...")
 addTooltip(serverCard, "Click to check again")
 
-local creatorName = createInfoCard(7, "CREATOR", "The MxzikaX Dev")
-creatorName.TextSize = 12
-
-
-local lastRainbow = 0
-local function updateCreatorRainbow()
-    if not infoPage.Visible then return end
-    local now = tick()
-    if now - lastRainbow < 0.1 then return end
-    lastRainbow = now
-    creatorName.TextColor3 = Color3.fromHSV((now % 5) / 5, 0.85, 1)
-end
-
-sectionHeader(8, "IMPORTANT NOTICES")
+sectionHeader(7, "IMPORTANT NOTICES")
 
 local noticeServer = createNotice(
     9,
@@ -1065,6 +1054,129 @@ serverCard.InputBegan:Connect(function(input)
     end
 end)
 
+-- ---------------------------------------------------------------------
+-- CREDITS TAB (avatar + name pulled live from the creator's account)
+-- ---------------------------------------------------------------------
+local creditsTitle = newLabel(creditsPage, "CREDITS", 13)
+creditsTitle.Size = UDim2.new(1, 0, 0, 22)
+
+local profileCard = create("Frame", {
+    Size = UDim2.new(1, 0, 0, 110),
+    Position = UDim2.new(0, 0, 0, 26),
+    BackgroundColor3 = THEME.card,
+    BorderSizePixel = 0,
+    Parent = creditsPage,
+})
+corner(profileCard, 12)
+
+local avatarFrame = create("Frame", {
+    Size = UDim2.new(0, 74, 0, 74),
+    Position = UDim2.new(0, 18, 0, 18),
+    BackgroundColor3 = THEME.card2,
+    BorderSizePixel = 0,
+    ClipsDescendants = true,
+    Parent = profileCard,
+})
+corner(avatarFrame, 37)
+local avatarStroke = create("UIStroke", {Color = THEME.accent, Thickness = 2, Parent = avatarFrame})
+bindAccent(function(c) avatarStroke.Color = c end)
+
+local avatarImage = create("ImageLabel", {
+    Size = UDim2.new(1, 0, 1, 0),
+    BackgroundTransparency = 1,
+    ScaleType = Enum.ScaleType.Crop,
+    Image = "",
+    Parent = avatarFrame,
+})
+
+local creatorNameLabel = newLabel(profileCard, "Loading...", 16, THEME.text, Enum.Font.GothamBold)
+creatorNameLabel.Position = UDim2.new(0, 108, 0, 20)
+creatorNameLabel.Size = UDim2.new(1, -180, 0, 20)
+creatorNameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+
+local creatorHandleLabel = newLabel(profileCard, "@...", 11, THEME.muted, Enum.Font.Gotham)
+creatorHandleLabel.Position = UDim2.new(0, 108, 0, 42)
+creatorHandleLabel.Size = UDim2.new(1, -180, 0, 16)
+
+local creatorUidLabel = newLabel(profileCard, "UID: " .. CREATOR_USER_ID, 9, Color3.fromRGB(90, 95, 110), Enum.Font.Gotham)
+creatorUidLabel.Position = UDim2.new(0, 108, 0, 62)
+creatorUidLabel.Size = UDim2.new(1, -180, 0, 14)
+
+local creatorBadge = create("Frame", {
+    AnchorPoint = Vector2.new(1, 0),
+    Position = UDim2.new(1, -14, 0, 14),
+    Size = UDim2.new(0, 84, 0, 20),
+    BackgroundColor3 = THEME.accent,
+    BackgroundTransparency = 0.82,
+    BorderSizePixel = 0,
+    Parent = profileCard,
+})
+corner(creatorBadge, 10)
+local creatorBadgeLabel = newLabel(creatorBadge, "CREATOR", 9, THEME.accent, Enum.Font.GothamBold, Enum.TextXAlignment.Center)
+creatorBadgeLabel.Size = UDim2.new(1, 0, 1, 0)
+bindAccent(function(c)
+    creatorBadge.BackgroundColor3 = c
+    creatorBadgeLabel.TextColor3 = c
+end)
+
+local aboutCard = create("Frame", {
+    Size = UDim2.new(1, 0, 0, 64),
+    Position = UDim2.new(0, 0, 0, 144),
+    BackgroundColor3 = THEME.card,
+    BorderSizePixel = 0,
+    Parent = creditsPage,
+})
+corner(aboutCard, 10)
+local aboutBar = create("Frame", {
+    Size = UDim2.new(0, 3, 1, -16),
+    Position = UDim2.new(0, 8, 0, 8),
+    BackgroundColor3 = THEME.accent,
+    BorderSizePixel = 0,
+    Parent = aboutCard,
+})
+corner(aboutBar, 2)
+bindAccent(function(c) aboutBar.BackgroundColor3 = c end)
+local aboutTitle = newLabel(aboutCard, "About this script", 11, THEME.text)
+aboutTitle.Position = UDim2.new(0, 22, 0, 6)
+aboutTitle.Size = UDim2.new(1, -32, 0, 16)
+local aboutDesc = newLabel(aboutCard, "This HUB was created and is maintained by the account above. The avatar and name update automatically if that account changes.", 10, Color3.fromRGB(185, 190, 205), Enum.Font.Gotham)
+aboutDesc.Position = UDim2.new(0, 22, 0, 25)
+aboutDesc.Size = UDim2.new(1, -32, 0, 34)
+aboutDesc.TextWrapped = true
+aboutDesc.TextYAlignment = Enum.TextYAlignment.Top
+
+-- pulls the creator's current avatar + username; re-checks periodically so
+-- changing the account's photo or name updates the GUI without editing the script
+task.spawn(function()
+    while screenGui.Parent do
+        local okThumb, thumb = pcall(function()
+            return Players:GetUserThumbnailAsync(CREATOR_USER_ID, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+        end)
+        if okThumb and thumb then
+            avatarImage.Image = thumb
+        end
+
+        local okName, uname = pcall(function()
+            return Players:GetNameFromUserIdAsync(CREATOR_USER_ID)
+        end)
+        if okName and uname then
+            setText(creatorNameLabel, uname)
+            setText(creatorHandleLabel, "@" .. uname)
+        end
+
+        task.wait(300)
+    end
+end)
+
+-- rainbow name, throttled and only while the CREDITS tab is visible
+local lastRainbow = 0
+local function updateCreatorRainbow()
+    if not creditsPage.Visible then return end
+    local now = tick()
+    if now - lastRainbow < 0.1 then return end
+    lastRainbow = now
+    creatorNameLabel.TextColor3 = Color3.fromHSV((now % 5) / 5, 0.85, 1)
+end
 
 local configTitle = newLabel(configPage, "CONFIG", 13)
 configTitle.Size = UDim2.new(1, 0, 0, 22)
@@ -1238,9 +1350,9 @@ shortcutText.Size = UDim2.new(1, -24, 1, 0)
 shortcutText.TextWrapped = true
 
 
-local TAB_ORDER = {"farm", "info", "config"}
-local TAB_TEXT = {farm = "FARM", info = "INFO", config = "CONFIG"}
-local pageOf = {farm = farmPage, info = infoPage, config = configPage}
+local TAB_ORDER = {"farm", "info", "credits", "config"}
+local TAB_TEXT = {farm = "FARM", info = "INFO", credits = "CREDITS", config = "CONFIG"}
+local pageOf = {farm = farmPage, info = infoPage, credits = creditsPage, config = configPage}
 local INACTIVE_TAB = Color3.fromRGB(25, 28, 39)
 local INACTIVE_TEXT = Color3.fromRGB(170, 175, 190)
 local tabs = {}
