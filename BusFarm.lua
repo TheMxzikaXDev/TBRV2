@@ -39,7 +39,9 @@ local function sendDiscord(url, data)
     end)
 end
 
-
+-- ---------------------------------------------------------------------
+-- Sounds + logo (edit these constants to change them)
+-- ---------------------------------------------------------------------
 local SoundService = game:GetService("SoundService")
 local Debris = game:GetService("Debris")
 
@@ -61,7 +63,8 @@ local function playSound(id, volume)
     end)
 end
 
-
+-- downloads the logo once (cached in the executor workspace) and shows it;
+-- if the executor has no file functions, the fallback letter stays visible
 local logoAssetCache = nil
 local function loadLogo(imageLabel, fallbackLabel, backingFrame)
     task.spawn(function()
@@ -378,7 +381,9 @@ end
 local EXACT_ROUTE_DISTANCE = calculateTotalRouteDistance()
 local EXACT_SPEED = EXACT_ROUTE_DISTANCE / TRAVEL_TIME
 
-
+-- =====================================================================
+--  GUI (lightweight) - interface only, the farm logic stays below
+-- =====================================================================
 local oldGui = playerGui:FindFirstChild("BusFarmGui")
 if oldGui then oldGui:Destroy() end
 
@@ -408,7 +413,9 @@ local ACCENTS = {
     {"Cyan",   Color3.fromRGB(40, 210, 220)},
 }
 
-
+-- ---------------------------------------------------------------------
+-- Helpers
+-- ---------------------------------------------------------------------
 local connections = {}
 local function connect(signal, callback)
     local c = signal:Connect(callback)
@@ -451,7 +458,7 @@ local function setText(label, text)
     if label.Text ~= text then label.Text = text end
 end
 
-
+-- accent color (theme) bindings
 local accentBinds = {}
 local function bindAccent(fn)
     table.insert(accentBinds, fn)
@@ -467,7 +474,9 @@ local userScale = 1
 local notificationsEnabled = true
 local guiOpen = true
 
-
+-- ---------------------------------------------------------------------
+-- ScreenGui + tooltip
+-- ---------------------------------------------------------------------
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "BusFarmGui"
 screenGui.ResetOnSpawn = false
@@ -516,7 +525,9 @@ local function hoverEffect(button, getBase)
     end)
 end
 
-
+-- ---------------------------------------------------------------------
+-- Main window
+-- ---------------------------------------------------------------------
 local root = create("Frame", {
     Name = "Root",
     AnchorPoint = Vector2.new(0.5, 0.5),
@@ -538,7 +549,7 @@ local main = create("Frame", {
 corner(main, 18)
 create("UIStroke", {Color = THEME.stroke, Thickness = 1.5, Parent = main})
 
-
+-- static accent bar on top
 local topGlow = create("Frame", {
     Name = "TopGlow",
     Size = UDim2.new(1, 0, 0, 3),
@@ -549,7 +560,7 @@ local topGlow = create("Frame", {
 })
 bindAccent(function(c) topGlow.BackgroundColor3 = c end)
 
-
+-- header
 local header = create("Frame", {
     Name = "Header",
     Size = UDim2.new(1, 0, 0, 46),
@@ -558,7 +569,7 @@ local header = create("Frame", {
     Parent = main,
 })
 corner(header, 18)
-create("Frame", { 
+create("Frame", { -- keeps the bottom of the header straight
     Size = UDim2.new(1, 0, 0, 20),
     Position = UDim2.new(0, 0, 1, -20),
     BackgroundColor3 = THEME.header,
@@ -595,7 +606,7 @@ local headerSub = newLabel(header, "Bus Farm - v4.2", 10, THEME.muted, Enum.Font
 headerSub.Size = UDim2.new(0, 190, 0, 14)
 headerSub.Position = UDim2.new(0, 50, 0, 25)
 
-
+-- status pill
 local pill = create("Frame", {
     Size = UDim2.new(0, 104, 0, 24),
     Position = UDim2.new(1, -181, 0, 11),
@@ -646,7 +657,7 @@ corner(close, 8)
 hoverEffect(close, function() return Color3.fromRGB(150, 45, 55) end)
 addTooltip(close, "Close and stop the farm")
 
-
+-- sidebar / content
 local side = create("Frame", {
     Name = "Side",
     Size = UDim2.new(0, 110, 1, -46),
@@ -656,7 +667,7 @@ local side = create("Frame", {
     Parent = main,
 })
 corner(side, 18)
-create("Frame", {
+create("Frame", { -- keeps the right side of the sidebar straight
     Size = UDim2.new(0, 30, 1, 0),
     Position = UDim2.new(1, -30, 0, 0),
     BackgroundColor3 = THEME.side,
@@ -695,7 +706,9 @@ local farmPage = newPage("FarmPage", true)
 local infoPage = newPage("InfoPage", false)
 local configPage = newPage("ConfigPage", false)
 
-
+-- ---------------------------------------------------------------------
+-- Toasts (notifications)
+-- ---------------------------------------------------------------------
 local toastHolder = create("Frame", {
     Name = "Toasts",
     AnchorPoint = Vector2.new(1, 1),
@@ -720,7 +733,7 @@ local function notify(text, color)
     color = color or THEME.accent
     toastCount += 1
 
-   
+    -- keep at most 3 toasts alive
     local kids = toastHolder:GetChildren()
     if #kids > 4 then
         for _, k in ipairs(kids) do
@@ -767,7 +780,9 @@ local function notify(text, color)
     end)
 end
 
-
+-- ---------------------------------------------------------------------
+-- FARM TAB
+-- ---------------------------------------------------------------------
 local farmTitle = newLabel(farmPage, "MODO FASTER FARM", 13)
 farmTitle.Size = UDim2.new(1, 0, 0, 22)
 
@@ -883,7 +898,9 @@ local toggle = create("TextButton", {
 corner(toggle, 10)
 hoverEffect(toggle, function() return toggleBase end)
 
-
+-- ---------------------------------------------------------------------
+-- INFO TAB
+-- ---------------------------------------------------------------------
 local infoTitle = newLabel(infoPage, "INFORMATION", 13)
 infoTitle.Size = UDim2.new(1, 0, 0, 22)
 
@@ -1001,7 +1018,7 @@ addTooltip(serverCard, "Click to check again")
 local creatorName = createInfoCard(7, "CREATOR", "The MxzikaX Dev")
 creatorName.TextSize = 12
 
-
+-- rainbow creator name (throttled: only while the INFO tab is visible)
 local lastRainbow = 0
 local function updateCreatorRainbow()
     if not infoPage.Visible then return end
@@ -1035,7 +1052,7 @@ createNotice(
     "20% PER 1M"
 )
 
-
+-- private server check (read-only, informational)
 local function isPrivateServer()
     local ok, result = pcall(function()
         return game.PrivateServerId ~= ""
@@ -1065,7 +1082,9 @@ serverCard.InputBegan:Connect(function(input)
     end
 end)
 
-
+-- ---------------------------------------------------------------------
+-- CONFIG TAB
+-- ---------------------------------------------------------------------
 local configTitle = newLabel(configPage, "CONFIG", 13)
 configTitle.Size = UDim2.new(1, 0, 0, 22)
 
@@ -1148,7 +1167,7 @@ local function updateSlider(x)
     sliderKnob.Position = UDim2.new(snapped, 0, 0.5, 0)
     sliderValue.Text = math.floor(pendingScale * 100 + 0.5) .. "%"
 end
-
+-- start the slider at 100% (range is 50% - 120%)
 do
     local snapped = (1 - 0.5) / 0.7
     sliderFill.Size = UDim2.new(snapped, 0, 1, 0)
@@ -1237,7 +1256,9 @@ shortcutText.Position = UDim2.new(0, 12, 0, 0)
 shortcutText.Size = UDim2.new(1, -24, 1, 0)
 shortcutText.TextWrapped = true
 
-
+-- ---------------------------------------------------------------------
+-- Tabs (sidebar)
+-- ---------------------------------------------------------------------
 local TAB_ORDER = {"farm", "info", "config"}
 local TAB_TEXT = {farm = "FARM", info = "INFO", config = "CONFIG"}
 local pageOf = {farm = farmPage, info = infoPage, config = configPage}
@@ -1245,7 +1266,7 @@ local INACTIVE_TAB = Color3.fromRGB(25, 28, 39)
 local INACTIVE_TEXT = Color3.fromRGB(170, 175, 190)
 local tabs = {}
 local currentTab = "farm"
-local refreshVisible 
+local refreshVisible -- assigned in the update loop section
 
 local function activeTabColor()
     return THEME.accent:Lerp(Color3.new(0, 0, 0), 0.3)
@@ -1308,7 +1329,9 @@ for i, key in ipairs(TAB_ORDER) do
     button.MouseButton1Click:Connect(function() switchTab(key) end)
 end
 
-
+-- ---------------------------------------------------------------------
+-- State functions used by the farm logic
+-- ---------------------------------------------------------------------
 local logEntries = {}
 local function logLine(text, color)
     table.insert(logEntries, 1, {text = os.date("%H:%M:%S") .. "  " .. text, color = color or THEME.muted})
@@ -1384,7 +1407,7 @@ local function setStatus(running)
     lastRunning = running
 end
 
-
+-- route error (the logic writes "[ ROUTE ERROR ]" into the status label)
 status:GetPropertyChangedSignal("Text"):Connect(function()
     if status.Text:find("ERROR") then
         pillText.Text = "ERROR"
@@ -1431,7 +1454,9 @@ local function updateStop(value)
     lastStopLogged = value
 end
 
-
+-- ---------------------------------------------------------------------
+-- Minimize / restore / close / drag / hotkey
+-- ---------------------------------------------------------------------
 local restore = create("TextButton", {
     AnchorPoint = Vector2.new(0.5, 0.5),
     Size = UDim2.new(0, 150, 0, 40),
@@ -1483,7 +1508,7 @@ close.MouseButton1Click:Connect(function()
     end)
 end)
 
-
+-- drag by header
 local dragging = false
 local dragStart
 local startPosition
@@ -1515,7 +1540,9 @@ connect(UserInputService.InputBegan, function(input, processed)
     end
 end)
 
-
+-- ---------------------------------------------------------------------
+-- Update loop (1x per second, only touches the tab that is visible)
+-- ---------------------------------------------------------------------
 local function formatTime(seconds)
     seconds = math.floor(seconds)
     return string.format("%02d:%02d:%02d", seconds // 3600, (seconds % 3600) // 60, seconds % 60)
@@ -1574,7 +1601,7 @@ task.spawn(function()
     end
 end)
 
-
+-- entrance + startup sound + first notices
 tween(uiScale, 0.3, {Scale = 1})
 playSound(SOUND_OPEN, 0.7)
 logLine("Interface loaded", THEME.muted)
@@ -1617,17 +1644,17 @@ local function glideExactTime(vehicleModel, seatPart, targetCF, duration)
     end
 end
 
-
+-- NOVA FUNCAO: Zera 100% a velocidade (para o jogo registrar parada) e envia toques pros checkpoints em volta 
 local function guaranteeCheckpoint(vehicleModel, seatPart, targetCF, stopDuration)
     local startTime = tick()
     local lastTouch = 0
 
     while isRunning and (tick() - startTime) < stopDuration do
-        
+        -- Mantem o onibus 100% imovel no lugar exato (sem o movimento doido da ultima versao)
         vehicleModel:PivotTo(targetCF + Vector3.new(0, 3, 0))
         freezePhysics(seatPart)
         
-      
+        -- A cada 0.5 segundos, forcamos o "toque" nos checkpoints ao redor silenciosamente
         if tick() - lastTouch > 0.5 then
             lastTouch = tick()
             task.spawn(function()
@@ -1744,7 +1771,7 @@ local function startFarm()
                 glideExactTime(vehicleModel, seat, busStops[i], duration)
                 if not isRunning then return end
                 
-              
+                -- Usa o tempo exato de 3s travando o onibus 100% no local.
                 guaranteeCheckpoint(vehicleModel, seat, busStops[i], STOP_TIME)
                 if not isRunning then return end
 
